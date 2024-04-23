@@ -3,6 +3,8 @@ import config
 import game
 import pypboy.ui
 from math import atan2, pi, degrees
+from time import sleep
+import threading
 
 from pypboy.modules import data
 from pypboy.modules import items
@@ -15,6 +17,8 @@ if config.GPIO_AVAILABLE:
 class Pypboy(game.core.Engine):
 
     currentModule = 0
+    dial_value = 0
+    last_dial_value = 0
 
     def __init__(self, *args, **kwargs):
         if hasattr(config, 'OUTPUT_WIDTH') and hasattr(config, 'OUTPUT_HEIGHT'):
@@ -60,8 +64,40 @@ class Pypboy(game.core.Engine):
 
     def check_gpio_input(self):
         for pin in self.gpio_actions.keys():
-            if GPIO.input(pin) == False:
-                self.handle_action(self.gpio_actions[pin])
+            if not (self.gpio_actions[pin] == "dial_dt" or self.gpio_actions[pin] == "dial_clk"):
+                if GPIO.input(pin) == False:
+                    self.handle_action(self.gpio_actions[pin])
+                    
+        dial_value = self.dial_value
+        if self.last_dial_value != dial_value:
+            if self.last_dial_value > dial_value:
+                self.handle_action("dial_up")
+            else:
+                self.handle_action("dial_down")
+            self.last_dial_value = dial_value
+        
+    def check_rotary_endcoder(self):
+        if config.GPIO_AVAILABLE:
+            clkStatePin = 0
+            dtStatePin = 0        
+            for pin in self.gpio_actions.keys():
+                if self.gpio_actions[pin] == "dial_dt":
+                    dtStatePin = pin
+                elif self.gpio_actions[pin] == "dial_clk":
+                    clkStatePin = pin
+            GPIO.setup(dtStatePin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(clkStatePin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            clkLastState = 0
+            while self.running:
+                dtState = GPIO.input(dtStatePin)
+                clkState = GPIO.input(clkStatePin)
+                if clkState != clkLastState:
+                    if dtState != clkState:
+                        self.dial_value += 1
+                    else:
+                        self.dial_value -= 1
+                    sleep(0.5)
+                    clkLastState = GPIO.input(clkStatePin)
 
     def update(self):
         if hasattr(self, 'active'):
@@ -218,6 +254,10 @@ class Pypboy(game.core.Engine):
 
     def run(self):
         self.running = True
+        
+        x = threading.Thread(target=self.check_rotary_endcoder)
+        x.start()
+        
         while self.running:
             if config.GPIO_AVAILABLE:
                 self.check_gpio_input()

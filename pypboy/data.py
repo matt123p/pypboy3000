@@ -6,6 +6,7 @@ from math import log10
 import math
 import pygame
 import sys
+import os
 
 
 class Maps(object):
@@ -101,13 +102,15 @@ class Maps(object):
                 bounds[1] + self.height
         )
         if isWorld:
-            with open('worldMap.cache', 'r', encoding="utf-8") as mapcache:
-                map_data = mapcache.read().replace("b'", "").replace("\\n", "")[0:-1]
-            self.display_map(map_data)
+            if os.path.exists('worldMap.cache'):
+                with open('worldMap.cache', 'r', encoding="utf-8") as mapcache:
+                    map_data = mapcache.read().replace("b'", "").replace("\\n", "")[0:-1]
+                self.display_map(map_data)
         else:
-            with open('localMap.cache', 'r', encoding="utf-8") as mapcache:
-                map_data = mapcache.read().replace("b'", "").replace("\\n", "")[0:-1]
-            self.display_map(map_data)
+            if os.path.exists('localMap.cache'):
+                with open('localMap.cache', 'r', encoding="utf-8") as mapcache:
+                    map_data = mapcache.read().replace("b'", "").replace("\\n", "")[0:-1]
+                self.display_map(map_data)
             
     def display_map(self, map_data):
         try:

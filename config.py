@@ -1,5 +1,13 @@
 import pygame
 
+import os
+
+# Change working folder
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+print(dname)
+os.chdir(dname)
+
 PLAYERNAME = "Markuspwn"
 PLAYERLEVEL = 10
 WIDTH = 480
@@ -64,10 +72,21 @@ ACTIONS = {
 #GPIO 23 pin16 reboot
 #GPIO 25 pin 22 blank screen do not use
 GPIO_ACTIONS = {
-	4: "dial_down", #GPIO 23
-	17: "dial_up", #GPIO 24
-	22: "knob_down", #GPIO 4
-	27: "knob_up", #GPIO 17
+    4: "module_stats", #GPIO 4
+    14: "module_items", #GPIO 14
+    15: "module_data", #GPIO 15
+
+    16: "knob_1", #GPIO 16
+    19: "knob_2", #GPIO 19
+    20: "knob_3", #GPIO 20
+    21: "knob_4", #GPIO 21
+    26: "knob_5", #GPIO 26
+
+    18: "dial_dt", #GPIO 18
+    22: "dial_clk" #GPIO 22
+
+    # 22: "knob_down", #GPIO 4
+    # 27: "knob_up", #GPIO 17
 }
 
 # LEDs

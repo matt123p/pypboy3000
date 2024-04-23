@@ -25,10 +25,10 @@ class Engine(object):
         self.canvasSize = (config.WIDTH, config.HEIGHT)
         # ---------------------------------------------------------------
 
-        # self.window = pygame.display.set_mode((width, height),pygame.FULLSCREEN)
-        self.window = pygame.display.set_mode((width, height))
+        self.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        # self.window = pygame.display.set_mode((width, height))
         self.screen = pygame.display.get_surface()
-        pygame.display.set_mode(self.screenSize)
+        # pygame.display.set_mode(self.screenSize)
 
 
         # # Block queuing for unused events:
